@@ -17,6 +17,31 @@ A web-based image processing application that allows users to upload, transform,
 - Grayscale filter
 - Flip (horizontal/vertical)
 
+## API Documentation
+
+The application provides two interactive API documentation interfaces:
+
+1. **Swagger UI** (OpenAPI):
+   - URL: `http://localhost:8000/docs` (when running locally)
+   - URL: `http://localhost/docs` (when running in Docker)
+   - Interactive documentation with try-it-now functionality
+   - Detailed request/response schemas
+   - Authentication support
+
+2. **ReDoc**:
+   - URL: `http://localhost:8000/redoc` (when running locally)
+   - URL: `http://localhost/redoc` (when running in Docker)
+   - More readable, organized documentation
+   - Better for complex API exploration
+   - Includes detailed descriptions and examples
+
+Both interfaces provide:
+- Complete endpoint documentation
+- Request/response examples
+- Schema definitions
+- Authentication details
+- Error responses
+
 ## Setup and Run Instructions
 
 ### Prerequisites
