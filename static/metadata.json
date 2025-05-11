@@ -1,0 +1,97 @@
+{
+  "9622ae59-c7a7-49be-8872-34a459b62173": {
+    "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+    "filename": "1727027772337 (1).jpg",
+    "created_at": "2025-05-11T19:28:00.366749",
+    "versions": [
+      {
+        "version_id": "bbb4b387-8587-4de8-962c-62490ebea8f9",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "bbb4b387-8587-4de8-962c-62490ebea8f9_1727027772337 (1).jpg",
+        "url": "/static/bbb4b387-8587-4de8-962c-62490ebea8f9_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T19:28:00.366749",
+        "transformation": null
+      },
+      {
+        "version_id": "016999ab-4168-4063-b3da-34764b8a5ae5",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "016999ab-4168-4063-b3da-34764b8a5ae5_1727027772337 (1).jpg",
+        "url": "/static/016999ab-4168-4063-b3da-34764b8a5ae5_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T19:28:21.527595",
+        "transformation": "crop:0,461,1914,1861"
+      },
+      {
+        "version_id": "12335934-56f6-4478-85b3-9bd3da0b0aaa",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "12335934-56f6-4478-85b3-9bd3da0b0aaa_1727027772337 (1).jpg",
+        "url": "/static/12335934-56f6-4478-85b3-9bd3da0b0aaa_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T19:30:33.215149",
+        "transformation": "grayscale"
+      },
+      {
+        "version_id": "53ae21ab-b87b-445e-9a34-b8da7a06d4d9",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "53ae21ab-b87b-445e-9a34-b8da7a06d4d9_1727027772337 (1).jpg",
+        "url": "/static/53ae21ab-b87b-445e-9a34-b8da7a06d4d9_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T19:30:48.435400",
+        "transformation": "resize:200x200"
+      },
+      {
+        "version_id": "fe0b79e7-7f6a-4984-9eaa-d70256c991ba",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "fe0b79e7-7f6a-4984-9eaa-d70256c991ba_1727027772337 (1).jpg",
+        "url": "/static/fe0b79e7-7f6a-4984-9eaa-d70256c991ba_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T19:35:37.481477",
+        "transformation": "resize:600x600"
+      },
+      {
+        "version_id": "a08f3090-6e7e-4b7c-8c91-ca057f1bd077",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "a08f3090-6e7e-4b7c-8c91-ca057f1bd077_1727027772337 (1).jpg",
+        "url": "/static/a08f3090-6e7e-4b7c-8c91-ca057f1bd077_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T19:36:05.646728",
+        "transformation": "resize:600x600"
+      },
+      {
+        "version_id": "78be01f0-7dcb-4bca-b26e-df835e7982ca",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "78be01f0-7dcb-4bca-b26e-df835e7982ca_1727027772337 (1).jpg",
+        "url": "/static/78be01f0-7dcb-4bca-b26e-df835e7982ca_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T19:36:14.657072",
+        "transformation": "grayscale"
+      },
+      {
+        "version_id": "2fa27bf3-481d-41cd-8a60-defc086bcd57",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "2fa27bf3-481d-41cd-8a60-defc086bcd57_1727027772337 (1).jpg",
+        "url": "/static/2fa27bf3-481d-41cd-8a60-defc086bcd57_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T19:36:27.371271",
+        "transformation": "brightness_contrast:1.0,1.0"
+      },
+      {
+        "version_id": "9e8ee4b4-9fca-43d7-80f5-e362fe5ee496",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "9e8ee4b4-9fca-43d7-80f5-e362fe5ee496_1727027772337 (1).jpg",
+        "url": "/static/9e8ee4b4-9fca-43d7-80f5-e362fe5ee496_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T19:36:47.126187",
+        "transformation": "flip:vertical"
+      },
+      {
+        "version_id": "6bad44c6-43db-4077-b88f-649d5a9fb97e",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "6bad44c6-43db-4077-b88f-649d5a9fb97e_1727027772337 (1).jpg",
+        "url": "/static/6bad44c6-43db-4077-b88f-649d5a9fb97e_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T20:19:23.480264",
+        "transformation": "crop:0,496,1790,1684"
+      },
+      {
+        "version_id": "de82f9e3-d9c0-4e24-ad3a-8209ae935507",
+        "image_id": "9622ae59-c7a7-49be-8872-34a459b62173",
+        "filename": "de82f9e3-d9c0-4e24-ad3a-8209ae935507_1727027772337 (1).jpg",
+        "url": "/static/de82f9e3-d9c0-4e24-ad3a-8209ae935507_1727027772337 (1).jpg",
+        "created_at": "2025-05-11T20:19:56.951345",
+        "transformation": "resize:599x600"
+      }
+    ]
+  }
+}

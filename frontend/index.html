@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Processing App</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        .gallery { 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1em;
+            padding: 0.75em;
+        }
+        .image-container { 
+            margin: 0.5em;
+            padding: 0.75em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .gallery img { 
+            max-width: 100%;
+            height: auto;
+            margin: 0.35em 0;
+            border-radius: 3px;
+        }
+        .transform-controls { 
+            margin-top: 0.5em;
+            padding: 0.5em;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .transform-controls select, 
+        .transform-controls input { 
+            margin: 0.3em;
+            padding: 0.3em;
+            font-size: 0.9em;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            min-width: 120px;
+        }
+        .transform-controls button { 
+            margin: 0.3em;
+            padding: 0.3em 0.5em;
+            font-size: 0.9em;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .transform-controls button:hover {
+            background: #0056b3;
+        }
+        .version-history { 
+            margin-top: 0.75em;
+            padding: 0.75em;
+            border-top: 1px solid #ccc;
+        }
+        .version-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5em;
+            margin-top: 0.5em;
+        }
+        .version-item { 
+            margin: 0.3em 0;
+            padding: 0.5em;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        .version-item img { 
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 0.3em;
+            border-radius: 3px;
+        }
+        .version-item.active { 
+            background-color: #e6f3ff;
+            border: 2px solid #007bff;
+        }
+        .button-group { 
+            margin-top: 0.5em;
+            display: flex;
+            gap: 0.3em;
+        }
+        .button-group button { 
+            padding: 0.3em 0.5em;
+            font-size: 0.9em;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            color: #bbb;
+        }
+
+        /* Upload form styles */
+        #uploadForm {
+            margin: 1em 0;
+            padding: 1em;
+            background: #f8f9fa;
+            border-radius: 4px;
+            text-align: center;
+        }
+        #uploadForm input[type="file"] {
+            padding: 0.5em;
+            font-size: 0.9em;
+        }
+        #uploadForm button {
+            padding: 0.3em 1em;
+            font-size: 0.9em;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 0.5em;
+        }
+        #uploadForm button:hover {
+            background: #218838;
+        }
+
+        /* Headers */
+        h1 {
+            font-size: 1.75em;
+            text-align: center;
+            margin-bottom: 0.5em;
+        }
+        h2 {
+            font-size: 1.25em;
+        }
+        h3 {
+            font-size: 1.1em;
+        }
+
+        /* Operation specific controls */
+        .operation-controls {
+            margin-top: 0.5em;
+            padding: 0.5em;
+            background: #fff;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .operation-controls input[type="number"] {
+            width: 80px;
+        }
+        .operation-controls select {
+            min-width: 120px;
+        }
+        
+        /* Crop styles */
+        .crop-container {
+            position: relative;
+            display: inline-block;
+            margin: 0.5em 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .crop-overlay {
+            position: absolute;
+            border: 2px solid #00ff00;
+            background-color: rgba(0, 0, 0, 0.5);
+            cursor: crosshair;
+            display: none;
+        }
+        .crop-preview {
+            max-width: 100%;
+            display: block;
+            cursor: crosshair;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .crop-controls {
+            margin-top: 0.5em;
+        }
+        .crop-controls button {
+            margin-right: 0.3em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Processing App</h1>
+    <h2>Upload Image</h2>
+    <form id="uploadForm">
+        <input type="file" name="file" required />
+        <button type="submit">Upload</button>
+    </form>
+    <h2>Gallery</h2>
+    <div class="gallery" id="gallery"></div>
+
+    <!-- Modal for enlarged images -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="enlargedImage">
+    </div>
+
+    <script>
+        const BASE_URL = '/images';
+        let currentCropState = null;
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('enlargedImage');
+        const closeModal = document.querySelector('.close-modal');
+
+        function createCropOverlay(imageElement, onCropComplete) {
+            const container = document.createElement('div');
+            container.className = 'crop-container';
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'crop-overlay';
+            
+            const preview = imageElement.cloneNode();
+            preview.className = 'crop-preview';
+            preview.draggable = false;  // Prevent image dragging
+            preview.onerror = function() {
+                this.src = 'data:image/svg+xml;base64,' + btoa('<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" font-family="Arial" font-size="14" fill="#999" text-anchor="middle" dy=".3em">Image Not Found</text></svg>');
+                this.onerror = null;
+            };
+            
+            container.appendChild(preview);
+            container.appendChild(overlay);
+            
+            let isDragging = false;
+            let startX, startY;
+            let cropX, cropY, cropWidth, cropHeight;
+            
+            function updateOverlay() {
+                overlay.style.left = cropX + 'px';
+                overlay.style.top = cropY + 'px';
+                overlay.style.width = cropWidth + 'px';
+                overlay.style.height = cropHeight + 'px';
+            }
+            
+            preview.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isDragging = true;
+                const rect = preview.getBoundingClientRect();
+                startX = e.offsetX;
+                startY = e.offsetY;
+                cropX = startX;
+                cropY = startY;
+                cropWidth = 0;
+                cropHeight = 0;
+                overlay.style.display = 'block';
+                overlay.style.left = cropX + 'px';
+                overlay.style.top = cropY + 'px';
+                overlay.style.width = '0px';
+                overlay.style.height = '0px';
+            });
+            
+            preview.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                const currentX = e.offsetX;
+                const currentY = e.offsetY;
+                
+                cropWidth = currentX - startX;
+                cropHeight = currentY - startY;
+                
+                if (cropWidth < 0) {
+                    cropX = currentX;
+                    cropWidth = Math.abs(cropWidth);
+                }
+                if (cropHeight < 0) {
+                    cropY = currentY;
+                    cropHeight = Math.abs(cropHeight);
+                }
+                
+                overlay.style.left = cropX + 'px';
+                overlay.style.top = cropY + 'px';
+                overlay.style.width = cropWidth + 'px';
+                overlay.style.height = cropHeight + 'px';
+            });
+            
+            preview.addEventListener('mouseup', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                isDragging = false;
+                
+                if (cropWidth > 10 && cropHeight > 10) {
+                    const rect = preview.getBoundingClientRect();
+                    const scaleX = preview.naturalWidth / rect.width;
+                    const scaleY = preview.naturalHeight / rect.height;
+                    
+                    // Calculate the scaled coordinates
+                    const scaledLeft = Math.round(cropX * scaleX);
+                    const scaledTop = Math.round(cropY * scaleY);
+                    const scaledRight = Math.round((cropX + cropWidth) * scaleX);
+                    const scaledBottom = Math.round((cropY + cropHeight) * scaleY);
+                    
+                    // Ensure coordinates are within image bounds
+                    currentCropState = {
+                        left: Math.max(0, Math.min(scaledLeft, preview.naturalWidth)),
+                        top: Math.max(0, Math.min(scaledTop, preview.naturalHeight)),
+                        right: Math.max(0, Math.min(scaledRight, preview.naturalWidth)),
+                        bottom: Math.max(0, Math.min(scaledBottom, preview.naturalHeight))
+                    };
+                    
+                    // Ensure right > left and bottom > top
+                    if (currentCropState.right <= currentCropState.left) {
+                        const temp = currentCropState.left;
+                        currentCropState.left = currentCropState.right;
+                        currentCropState.right = temp;
+                    }
+                    if (currentCropState.bottom <= currentCropState.top) {
+                        const temp = currentCropState.top;
+                        currentCropState.top = currentCropState.bottom;
+                        currentCropState.bottom = temp;
+                    }
+                    
+                    console.log('Crop coordinates:', currentCropState);
+                    console.log('Image dimensions:', preview.naturalWidth, 'x', preview.naturalHeight);
+                }
+            });
+            
+            // Add mouseleave handler to prevent getting stuck
+            preview.addEventListener('mouseleave', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    if (cropWidth > 10 && cropHeight > 10) {
+                        const rect = preview.getBoundingClientRect();
+                        const scaleX = preview.naturalWidth / rect.width;
+                        const scaleY = preview.naturalHeight / rect.height;
+                        
+                        // Calculate the scaled coordinates
+                        const scaledLeft = Math.round(cropX * scaleX);
+                        const scaledTop = Math.round(cropY * scaleY);
+                        const scaledRight = Math.round((cropX + cropWidth) * scaleX);
+                        const scaledBottom = Math.round((cropY + cropHeight) * scaleY);
+                        
+                        // Ensure coordinates are within image bounds
+                        currentCropState = {
+                            left: Math.max(0, Math.min(scaledLeft, preview.naturalWidth)),
+                            top: Math.max(0, Math.min(scaledTop, preview.naturalHeight)),
+                            right: Math.max(0, Math.min(scaledRight, preview.naturalWidth)),
+                            bottom: Math.max(0, Math.min(scaledBottom, preview.naturalHeight))
+                        };
+                        
+                        // Ensure right > left and bottom > top
+                        if (currentCropState.right <= currentCropState.left) {
+                            const temp = currentCropState.left;
+                            currentCropState.left = currentCropState.right;
+                            currentCropState.right = temp;
+                        }
+                        if (currentCropState.bottom <= currentCropState.top) {
+                            const temp = currentCropState.top;
+                            currentCropState.top = currentCropState.bottom;
+                            currentCropState.bottom = temp;
+                        }
+                    }
+                }
+            });
+            
+            return container;
+        }
+
+        // Modal functionality
+        function showEnlargedImage(imgSrc) {
+            modal.style.display = "block";
+            modalImg.src = imgSrc;
+        }
+
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Check authentication on page load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            fetchGallery();
+        });
+
+        // Add token to all fetch requests
+        async function fetchWithAuth(url, options = {}) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            const headers = {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`
+            };
+
+            try {
+                const response = await fetch(url, { ...options, headers });
+                if (response.status === 401) {
+                    // Token expired or invalid
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                    return;
+                }
+                return response;
+            } catch (error) {
+                console.error('Error:', error);
+                throw error;
+            }
+        }
+
+        async function fetchGallery() {
+            const res = await fetchWithAuth(`${BASE_URL}/gallery`, {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            const images = await res.json();
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            images.forEach(img => {
+                const latest = img.versions[img.versions.length-1];
+                const div = document.createElement('div');
+                div.className = 'image-container';
+                
+                // Create image display
+                const imgElement = document.createElement('img');
+                imgElement.src = latest.url;
+                imgElement.onerror = function() {
+                    // Use a data URL for a simple gray placeholder instead of making HTTP requests
+                    this.src = 'data:image/svg+xml;base64,' + btoa('<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" font-family="Arial" font-size="14" fill="#999" text-anchor="middle" dy=".3em">Image Not Found</text></svg>');
+                    this.onerror = null; // Prevent infinite loop
+                };
+                imgElement.onclick = () => showEnlargedImage(latest.url);
+                div.appendChild(imgElement);
+                
+                // Add filename
+                const filename = document.createElement('div');
+                filename.textContent = img.filename;
+                div.appendChild(filename);
+                
+                // Create transform controls
+                const controls = document.createElement('div');
+                controls.className = 'transform-controls';
+                
+                // Operation dropdown
+                const select = document.createElement('select');
+                select.innerHTML = `
+                    <option value="">Select operation</option>
+                    <option value="resize">Resize</option>
+                    <option value="rotate">Rotate</option>
+                    <option value="grayscale">Grayscale</option>
+                    <option value="crop">Crop</option>
+                    <option value="brightness_contrast">Brightness/Contrast</option>
+                    <option value="flip">Flip</option>
+                `;
+                controls.appendChild(select);
+                
+                // Size inputs (initially hidden)
+                const sizeInputs = document.createElement('div');
+                sizeInputs.style.display = 'none';
+                sizeInputs.innerHTML = `
+                    <input type="number" placeholder="Width" class="width-input" />
+                    <input type="number" placeholder="Height" class="height-input" />
+                `;
+                controls.appendChild(sizeInputs);
+                
+                // Angle input (initially hidden)
+                const angleInput = document.createElement('div');
+                angleInput.style.display = 'none';
+                angleInput.innerHTML = `
+                    <input type="number" placeholder="Angle" class="angle-input" />
+                `;
+                controls.appendChild(angleInput);
+
+                // Crop container (initially hidden)
+                const cropContainer = document.createElement('div');
+                cropContainer.style.display = 'none';
+                controls.appendChild(cropContainer);
+
+                // Brightness/Contrast inputs (initially hidden)
+                const brightnessContrastInputs = document.createElement('div');
+                brightnessContrastInputs.style.display = 'none';
+                brightnessContrastInputs.innerHTML = `
+                    <input type="number" step="0.1" min="0" max="2" placeholder="Brightness (0-2)" class="brightness-input" />
+                    <input type="number" step="0.1" min="0" max="2" placeholder="Contrast (0-2)" class="contrast-input" />
+                `;
+                controls.appendChild(brightnessContrastInputs);
+
+                // Flip direction input (initially hidden)
+                const flipInput = document.createElement('div');
+                flipInput.style.display = 'none';
+                flipInput.innerHTML = `
+                    <select class="direction-input">
+                        <option value="horizontal">Horizontal</option>
+                        <option value="vertical">Vertical</option>
+                    </select>
+                `;
+                controls.appendChild(flipInput);
+                
+                // Apply button
+                const applyButton = document.createElement('button');
+                applyButton.textContent = 'Apply';
+                applyButton.onclick = () => applyTransform(img.image_id, select, sizeInputs, angleInput, cropContainer, brightnessContrastInputs, flipInput);
+                controls.appendChild(applyButton);
+                
+                // Show/hide inputs based on selected operation
+                select.onchange = () => {
+                    sizeInputs.style.display = select.value === 'resize' ? 'inline' : 'none';
+                    angleInput.style.display = select.value === 'rotate' ? 'inline' : 'none';
+                    cropContainer.style.display = select.value === 'crop' ? 'block' : 'none';
+                    brightnessContrastInputs.style.display = select.value === 'brightness_contrast' ? 'inline' : 'none';
+                    flipInput.style.display = select.value === 'flip' ? 'inline' : 'none';
+                    
+                    if (select.value === 'crop') {
+                        cropContainer.innerHTML = '';
+                        const container = document.createElement('div');
+                        container.className = 'crop-container';
+                        
+                        const overlay = document.createElement('div');
+                        overlay.className = 'crop-overlay';
+                        
+                        const preview = imgElement.cloneNode();
+                        preview.className = 'crop-preview';
+                        preview.draggable = false;
+                        preview.onerror = function() {
+                            this.src = 'data:image/svg+xml;base64,' + btoa('<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" font-family="Arial" font-size="14" fill="#999" text-anchor="middle" dy=".3em">Image Not Found</text></svg>');
+                            this.onerror = null;
+                        };
+                        
+                        container.appendChild(preview);
+                        container.appendChild(overlay);
+                        cropContainer.appendChild(container);
+                        
+                        let isDragging = false;
+                        let startX, startY;
+                        let cropX, cropY, cropWidth, cropHeight;
+                        
+                        preview.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            isDragging = true;
+                            const rect = preview.getBoundingClientRect();
+                            startX = e.offsetX;
+                            startY = e.offsetY;
+                            cropX = startX;
+                            cropY = startY;
+                            cropWidth = 0;
+                            cropHeight = 0;
+                            overlay.style.display = 'block';
+                            overlay.style.left = cropX + 'px';
+                            overlay.style.top = cropY + 'px';
+                            overlay.style.width = '0px';
+                            overlay.style.height = '0px';
+                        });
+                        
+                        preview.addEventListener('mousemove', (e) => {
+                            if (!isDragging) return;
+                            e.preventDefault();
+                            
+                            const currentX = e.offsetX;
+                            const currentY = e.offsetY;
+                            
+                            cropWidth = currentX - startX;
+                            cropHeight = currentY - startY;
+                            
+                            if (cropWidth < 0) {
+                                cropX = currentX;
+                                cropWidth = Math.abs(cropWidth);
+                            }
+                            if (cropHeight < 0) {
+                                cropY = currentY;
+                                cropHeight = Math.abs(cropHeight);
+                            }
+                            
+                            overlay.style.left = cropX + 'px';
+                            overlay.style.top = cropY + 'px';
+                            overlay.style.width = cropWidth + 'px';
+                            overlay.style.height = cropHeight + 'px';
+                        });
+                        
+                        preview.addEventListener('mouseup', (e) => {
+                            if (!isDragging) return;
+                            e.preventDefault();
+                            isDragging = false;
+                            
+                            if (cropWidth > 10 && cropHeight > 10) {
+                                const rect = preview.getBoundingClientRect();
+                                const scaleX = preview.naturalWidth / rect.width;
+                                const scaleY = preview.naturalHeight / rect.height;
+                                
+                                // Calculate the scaled coordinates
+                                const scaledLeft = Math.round(cropX * scaleX);
+                                const scaledTop = Math.round(cropY * scaleY);
+                                const scaledRight = Math.round((cropX + cropWidth) * scaleX);
+                                const scaledBottom = Math.round((cropY + cropHeight) * scaleY);
+                                
+                                // Ensure coordinates are within image bounds
+                                currentCropState = {
+                                    left: Math.max(0, Math.min(scaledLeft, preview.naturalWidth)),
+                                    top: Math.max(0, Math.min(scaledTop, preview.naturalHeight)),
+                                    right: Math.max(0, Math.min(scaledRight, preview.naturalWidth)),
+                                    bottom: Math.max(0, Math.min(scaledBottom, preview.naturalHeight))
+                                };
+                                
+                                // Ensure right > left and bottom > top
+                                if (currentCropState.right <= currentCropState.left) {
+                                    const temp = currentCropState.left;
+                                    currentCropState.left = currentCropState.right;
+                                    currentCropState.right = temp;
+                                }
+                                if (currentCropState.bottom <= currentCropState.top) {
+                                    const temp = currentCropState.top;
+                                    currentCropState.top = currentCropState.bottom;
+                                    currentCropState.bottom = temp;
+                                }
+                                
+                                console.log('Crop coordinates:', currentCropState);
+                                console.log('Image dimensions:', preview.naturalWidth, 'x', preview.naturalHeight);
+                            }
+                        });
+
+                        // Add mouseleave handler to prevent getting stuck
+                        preview.addEventListener('mouseleave', () => {
+                            if (isDragging) {
+                                isDragging = false;
+                                if (cropWidth > 10 && cropHeight > 10) {
+                                    const rect = preview.getBoundingClientRect();
+                                    const scaleX = preview.naturalWidth / rect.width;
+                                    const scaleY = preview.naturalHeight / rect.height;
+                                    
+                                    // Calculate the scaled coordinates
+                                    const scaledLeft = Math.round(cropX * scaleX);
+                                    const scaledTop = Math.round(cropY * scaleY);
+                                    const scaledRight = Math.round((cropX + cropWidth) * scaleX);
+                                    const scaledBottom = Math.round((cropY + cropHeight) * scaleY);
+                                    
+                                    // Ensure coordinates are within image bounds
+                                    currentCropState = {
+                                        left: Math.max(0, Math.min(scaledLeft, preview.naturalWidth)),
+                                        top: Math.max(0, Math.min(scaledTop, preview.naturalHeight)),
+                                        right: Math.max(0, Math.min(scaledRight, preview.naturalWidth)),
+                                        bottom: Math.max(0, Math.min(scaledBottom, preview.naturalHeight))
+                                    };
+                                    
+                                    // Ensure right > left and bottom > top
+                                    if (currentCropState.right <= currentCropState.left) {
+                                        const temp = currentCropState.left;
+                                        currentCropState.left = currentCropState.right;
+                                        currentCropState.right = temp;
+                                    }
+                                    if (currentCropState.bottom <= currentCropState.top) {
+                                        const temp = currentCropState.top;
+                                        currentCropState.top = currentCropState.bottom;
+                                        currentCropState.bottom = temp;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                };
+                
+                div.appendChild(controls);
+
+                // Add version history section
+                const versionHistory = document.createElement('div');
+                versionHistory.className = 'version-history';
+                versionHistory.innerHTML = '<h3>Version History</h3>';
+                
+                // Add version list
+                const versionList = document.createElement('div');
+                versionList.className = 'version-list';
+                img.versions.forEach((version, index) => {
+                    const versionItem = document.createElement('div');
+                    versionItem.className = `version-item ${index === img.versions.length - 1 ? 'active' : ''}`;
+                    versionItem.innerHTML = `
+                        <img src="${version.url}" onerror="this.src='data:image/svg+xml;base64,${btoa('<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" font-family="Arial" font-size="14" fill="#999" text-anchor="middle" dy=".3em">Image Not Found</text></svg>')}';" />
+                        <div>Version ${index + 1}</div>
+                        <div>${version.transformation || 'Original'}</div>
+                        <div>${new Date(version.created_at).toLocaleString()}</div>
+                        <div class="button-group">
+                            <button onclick="revertToVersion('${img.image_id}', '${version.version_id}')">Revert to this version</button>
+                            <button onclick="deleteVersion('${img.image_id}', '${version.version_id}')" style="background-color: #ff4444; color: white;">Delete Version</button>
+                        </div>
+                    `;
+                    versionList.appendChild(versionItem);
+                });
+                versionHistory.appendChild(versionList);
+                div.appendChild(versionHistory);
+
+                // Add delete button
+                const buttonGroup = document.createElement('div');
+                buttonGroup.className = 'button-group';
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete Image';
+                deleteButton.style.backgroundColor = '#ff4444';
+                deleteButton.style.color = 'white';
+                deleteButton.onclick = () => deleteImage(img.image_id);
+                buttonGroup.appendChild(deleteButton);
+                div.appendChild(buttonGroup);
+                
+                gallery.appendChild(div);
+            });
+        }
+
+        async function deleteImage(image_id) {
+            if (!confirm('Are you sure you want to delete this image?')) {
+                return;
+            }
+            try {
+                await fetchWithAuth(`${BASE_URL}/${image_id}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                fetchGallery();
+            } catch (error) {
+                alert('Error deleting image: ' + error);
+            }
+        }
+
+        async function revertToVersion(image_id, version_id) {
+            if (!confirm('Are you sure you want to revert to this version?')) {
+                return;
+            }
+            try {
+                await fetchWithAuth(`${BASE_URL}/${image_id}/revert/${version_id}`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                fetchGallery();
+            } catch (error) {
+                alert('Error reverting to version: ' + error);
+            }
+        }
+
+        async function deleteVersion(image_id, version_id) {
+            if (!confirm('Are you sure you want to delete this version?')) {
+                return;
+            }
+            try {
+                await fetchWithAuth(`${BASE_URL}/${image_id}/versions/${version_id}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                fetchGallery();
+            } catch (error) {
+                alert('Error deleting version: ' + error);
+            }
+        }
+
+        function applyTransform(image_id, select, sizeInputs, angleInput, cropContainer, brightnessContrastInputs, flipInput) {
+            const operation = select.value;
+            if (!operation) {
+                alert('Please select an operation');
+                return;
+            }
+
+            // Find the current image in the gallery
+            const imageContainer = select.closest('.image-container');
+            const versionList = imageContainer.querySelector('.version-list');
+            // Get the last version item (latest version)
+            const versionItems = versionList.querySelectorAll('.version-item');
+            const latestVersion = versionItems[versionItems.length - 1];
+            
+            // Get the version_id from the delete button
+            const deleteButton = latestVersion.querySelector('button[onclick^="deleteVersion"]');
+            if (!deleteButton) {
+                console.error('Delete button not found');
+                return;
+            }
+            
+            const onclick = deleteButton.getAttribute('onclick');
+            if (!onclick) {
+                console.error('onclick attribute not found');
+                return;
+            }
+            
+            const match = onclick.match(/deleteVersion\('([^']+)', '([^']+)'\)/);
+            if (!match || !match[2]) {
+                console.error('Could not extract version ID');
+                return;
+            }
+            
+            const versionId = match[2];
+
+            let params = '';
+            if (operation === 'resize') {
+                const width = sizeInputs.querySelector('.width-input').value;
+                const height = sizeInputs.querySelector('.height-input').value;
+                if (!width || !height) {
+                    alert('Please enter both width and height');
+                    return;
+                }
+                params = `&width=${width}&height=${height}`;
+            } else if (operation === 'rotate') {
+                const angle = angleInput.querySelector('.angle-input').value;
+                if (!angle) {
+                    alert('Please enter an angle');
+                    return;
+                }
+                params = `&angle=${angle}`;
+            } else if (operation === 'crop') {
+                if (!currentCropState) {
+                    alert('Please select a crop area first');
+                    return;
+                }
+                params = `&left=${currentCropState.left}&top=${currentCropState.top}&right=${currentCropState.right}&bottom=${currentCropState.bottom}`;
+            } else if (operation === 'brightness_contrast') {
+                const brightness = brightnessContrastInputs.querySelector('.brightness-input').value || 1.0;
+                const contrast = brightnessContrastInputs.querySelector('.contrast-input').value || 1.0;
+                params = `&brightness=${brightness}&contrast=${contrast}`;
+            } else if (operation === 'flip') {
+                const direction = flipInput.querySelector('.direction-input').value;
+                params = `&direction=${direction}`;
+            }
+
+            // Always include version_id since we've validated it exists
+            params += `&version_id=${versionId}`;
+
+            fetchWithAuth(`${BASE_URL}/process/${image_id}?operation=${operation}${params}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(newVersion => {
+                // Update the main image with the new version
+                const mainImage = imageContainer.querySelector('img');
+                mainImage.src = newVersion.url;
+                
+                // Clear any operation-specific state
+                currentCropState = null;
+                
+                // Refresh the gallery to update version history
+                fetchGallery();
+            })
+            .catch(error => alert('Error applying transformation: ' + error));
+        }
+
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = new FormData(form);
+            await fetchWithAuth(`${BASE_URL}/upload`, {
+                method: 'POST',
+                body: data,
+                credentials: 'include'
+            });
+            form.reset();
+            fetchGallery();
+        };
+
+        // Add logout button
+        const header = document.querySelector('h1').parentNode;
+        const logoutButton = document.createElement('button');
+        logoutButton.textContent = 'Logout';
+        logoutButton.style.cssText = `
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 0.5em 1em;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        `;
+        logoutButton.onclick = () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        };
+        header.appendChild(logoutButton);
+    </script>
+</body>
+</html> 
