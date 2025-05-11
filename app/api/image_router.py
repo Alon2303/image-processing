@@ -262,7 +262,7 @@ def delete_image(image_id: str = Path(..., description="ID of the image to delet
     ok = storage.delete_image(image_id)
     if not ok:
         raise HTTPException(status_code=404, detail="Image not found")
-    return {"success": True}
+    return {"success": True} 
 
 @router.delete("/{image_id}/versions/{version_id}")
 async def delete_version(
